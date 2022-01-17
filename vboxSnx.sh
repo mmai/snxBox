@@ -7,6 +7,7 @@
 VM=debianSnx
 
 VMANAGE=/run/current-system/sw/bin/VBoxManage
+ADAPTATER=enp3s0 # host network adaptater to use
 
 BASEFOLDER=$(pwd)
 
@@ -40,7 +41,7 @@ createVm(){
   $VMANAGE createvm --name "$MACHINENAME" --ostype "Debian_64" --register --basefolder "$(pwd)"
 
   $VMANAGE modifyvm "$MACHINENAME" --memory $(("$RAM_MB")) --vram 128
-  # $VMANAGE modifyvm "$MACHINENAME" --nic1 nat
+  $VMANAGE modifyvm "$MACHINENAME" --nic1 bridge --bridgeadapter1 $ADAPTATER
   # $VMANAGE modifyvm "$MACHINENAME" --ioapic on
   # $VMANAGE modifyvm "$MACHINENAME" --cpus 4
   # $VMANAGE modifyvm "$MACHINENAME" --graphicscontroller vboxsvga
@@ -106,8 +107,7 @@ createVm(){
   # $VMANAGE guestcontrol "$MACHINENAME" --username "snxbox" --password "%password%" run --exe /bin/bash -- bash -c "echo -e \"%password%\n$PASSWORD\n$PASSWORD\" | passwd snxbox"
 
   # shutdown appliance
-  $VMANAGE guestcontrol "$MACHINENAME" --username "snxbox" --password "%password%" run --exe /bin/bash -- bash -c "sleep 10 && sudo /sbin/shutdown -h now"
-  # $VMANAGE guestcontrol "$MACHINENAME" --username "snxbox" --password "$PASSWORD" run --exe /bin/bash -- bash -c "sleep 10 && sudo /sbin/shutdown -h now"
+  $VMANAGE guestcontrol "$MACHINENAME" --username "snxbox" --password "$PASSWORD" run --exe /bin/bash -- bash -c "sleep 10 && sudo /sbin/shutdown -h now"
 
   # wait until VM is powered off
   while true; do
